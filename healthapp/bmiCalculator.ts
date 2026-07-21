@@ -1,4 +1,4 @@
-function calculateBmi(height: number, weight: number): string {
+export function calculateBmi(height: number, weight: number): string {
   const bmi = weight / ((height / 100) ** 2)
 
   if (bmi < 16.0) return "Severe thinness"
@@ -18,20 +18,22 @@ const parseArgs = (args: string[]): { height: number; weight: number } => {
   const height = Number(args[2])
   const weight = Number(args[3])
 
-  if (isNaN(height) || isNaN(weight)) {
+  if (isNaN(height) || isNaN(weight) || height <= 0 || weight <= 0) {
     throw new Error("Arguments must be numbers")
   }
 
   return { height, weight }
 }
 
-try {
-  const { height, weight } = parseArgs(process.argv)
-  console.log(calculateBmi(height, weight))
-} catch (error: unknown) {
-  if (error instanceof Error) {
-    console.log("Error:", error.message)
+if (process.argv[1] === import.meta.filename) {
+  try {
+    const { height, weight } = parseArgs(process.argv)
+    console.log(calculateBmi(height, weight))
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.log("Error:", error.message)
+    }
   }
 }
 
-export {}
+export { }
