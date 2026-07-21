@@ -50,4 +50,26 @@ const calculateExercises = (dailyHours: ExerciseHours, target: number): Exercise
   }
 }
 
-console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2))
+const parseArgs = (args: string[]): { target: number; dailyHours: number[] } => {
+  if (args.length < 4) throw new Error("Not enough arguments")
+
+  const target = Number(args[2])
+  const dailyHours = args.slice(3).map(Number)
+
+  if (isNaN(target) || dailyHours.some(isNaN)) {
+    throw new Error("Arguments must be numbers")
+  }
+
+  return { target, dailyHours }
+}
+
+try {
+  const { target, dailyHours } = parseArgs(process.argv)
+  console.log(calculateExercises(dailyHours, target))
+} catch (error: unknown) {
+  if (error instanceof Error) {
+    console.log("Error:", error.message)
+  }
+}
+
+export {}
