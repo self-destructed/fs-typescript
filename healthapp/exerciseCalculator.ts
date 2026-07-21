@@ -14,7 +14,7 @@ interface ExerciseResult {
 const RATING_DESCRIPTIONS: Record<Rating, string> = {
   3: "great job keep it up",
   2: "not too bad but could be better",
-  1: "not bad but could be better",
+  1: "bad",
 };
 
 const periodLength = (period: ExerciseHours): number => period.length;
@@ -72,4 +72,4 @@ try {
   }
 }
 
-export {};
+export { calculateExercises };
