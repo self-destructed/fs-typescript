@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "lib": ["es2022"],
+    "skipLibCheck": true,
     "noImplicitAny": true,
     "noEmit": true,
     "noUnusedLocals": true,
