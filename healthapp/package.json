@@ -1,0 +1,15 @@
+{
+  "name": "healthapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "calculateBmi": "tsc --noEmit && node bmiCalculator.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}
