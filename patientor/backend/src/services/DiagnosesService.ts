@@ -3,10 +3,10 @@ import type { Diagnosis } from "../types.ts";
 
 const diagnoses = diagnosesData;
 
-const getEntries = (): Diagnosis[] => {
+const getDiagnoses = (): Diagnosis[] => {
   return diagnoses;
 };
 
 export default {
-  getEntries
+  getDiagnoses
 };

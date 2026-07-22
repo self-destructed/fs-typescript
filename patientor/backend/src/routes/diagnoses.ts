@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 router.get('/', (_req, res: Response<Diagnosis[]>) => {
-  res.send(DiagnosesService.getEntries());
+  res.send(DiagnosesService.getDiagnoses());
 });
 
 router.post('/', (_req, res) => {
