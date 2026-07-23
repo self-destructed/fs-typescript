@@ -2,7 +2,7 @@ import { useState, SyntheticEvent } from "react";
 
 import {  TextField, InputLabel, MenuItem, Select, Grid, Button, SelectChangeEvent } from '@mui/material';
 
-import { PatientFormValues, Gender } from "../../types";
+import { PatientFormValues, Gender, type Gender as GenderType } from "../../types";
 
 interface Props {
   onCancel: () => void;
@@ -23,7 +23,7 @@ const AddPatientForm = ({ onCancel, onSubmit }: Props) => {
   const [occupation, setOccupation] = useState('');
   const [ssn, setSsn] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
-  const [gender, setGender] = useState(Gender.Other);
+  const [gender, setGender] = useState<GenderType>(Gender.Other);
 
   const onGenderChange = (event: SelectChangeEvent<string>) => {
     event.preventDefault();
