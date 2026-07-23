@@ -1,22 +1,20 @@
 import { Router } from 'express';
+import type { Request, Response } from 'express';
 import PatientService from '../services/PatientService.ts';
-import { toNewPatientEntry } from '../utils.ts';
+import type { NewPatient, Patient, PublicPatient } from '../types.ts';
+import { newPatientParser, errorMiddleware } from '../middleware.ts';
 
 const router = Router();
 
-router.get('/', (_req, res) => {
+router.get('/', (_req: Request, res: Response<PublicPatient[]>) => {
   res.json(PatientService.getPatients());
 });
 
-router.post('/', (req, res) => {
-  try {
-    const newPatientEntry = toNewPatientEntry(req.body);
-    const newPatient = PatientService.addPatient(newPatientEntry);
-    return res.json(newPatient);
-  } catch (error: unknown) {
-    if (error instanceof Error) return res.status(400).json({ error: error.message });
-    return res.status(400).json({ error: 'Unknown error' });
-  }
+router.post('/', newPatientParser, (req: Request<unknown, unknown, NewPatient>, res: Response<Patient>) => {
+  const newPatient = PatientService.addPatient(req.body);
+  return res.json(newPatient);
 });
+
+router.use(errorMiddleware);
 
 export default router;
