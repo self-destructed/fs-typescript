@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 import type { DiaryEntry, Weather, Visibility } from './types';
 import { Weather as WeatherOptions, Visibility as VisibilityOptions } from './types';
 import diaryService from './diaryService';
@@ -9,6 +10,7 @@ const App = () => {
   const [weather, setWeather] = useState<string>('');
   const [visibility, setVisibility] = useState<string>('');
   const [comment, setComment] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     diaryService.getAll().then(setDiaries);
@@ -16,6 +18,7 @@ const App = () => {
 
   const diaryCreation = (event: React.SyntheticEvent) => {
     event.preventDefault();
+    setError(null);
     diaryService
       .create({ date, weather: weather as Weather, visibility: visibility as Visibility, comment: comment || undefined })
       .then(returnedDiary => {
@@ -24,12 +27,21 @@ const App = () => {
         setWeather('');
         setVisibility('');
         setComment('');
+      })
+      .catch(error => {
+        if (axios.isAxiosError<{ error: { message: string; path: (string | number)[] }[] }>(error)) {
+          setError(error.response?.data?.error?.map(e => e.message).join('; ') ?? 'Unknown error');
+        } else {
+          setError('Something went wrong');
+        }
       });
   };
 
   return (
     <div>
       <h1>Flight diaries</h1>
+
+      {error && <div style={{ color: 'red' }}>{error}</div>}
 
       <form onSubmit={diaryCreation}>
         <div>
