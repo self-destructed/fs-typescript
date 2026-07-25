@@ -1,19 +1,67 @@
 import { useState, useEffect } from 'react';
-import type { DiaryEntry } from './types';
+import type { DiaryEntry, Weather, Visibility } from './types';
+import { Weather as WeatherOptions, Visibility as VisibilityOptions } from './types';
 import diaryService from './diaryService';
 
 const App = () => {
   const [diaries, setDiaries] = useState<DiaryEntry[]>([]);
+  const [date, setDate] = useState('');
+  const [weather, setWeather] = useState<string>('');
+  const [visibility, setVisibility] = useState<string>('');
+  const [comment, setComment] = useState('');
 
   useEffect(() => {
-    diaryService.getAll().then(initialDiaries => {
-      setDiaries(initialDiaries);
-    });
+    diaryService.getAll().then(setDiaries);
   }, []);
+
+  const diaryCreation = (event: React.SyntheticEvent) => {
+    event.preventDefault();
+    diaryService
+      .create({ date, weather: weather as Weather, visibility: visibility as Visibility, comment: comment || undefined })
+      .then(returnedDiary => {
+        setDiaries(diaries.concat(returnedDiary));
+        setDate('');
+        setWeather('');
+        setVisibility('');
+        setComment('');
+      });
+  };
 
   return (
     <div>
       <h1>Flight diaries</h1>
+
+      <form onSubmit={diaryCreation}>
+        <div>
+          date
+          <input type="date" value={date} onChange={e => setDate(e.target.value)} />
+        </div>
+        <div>
+          weather
+          <select value={weather} onChange={e => setWeather(e.target.value)}>
+            <option value="">—</option>
+            {Object.values(WeatherOptions).map(w => (
+              <option key={w} value={w}>{w}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          visibility
+          <select value={visibility} onChange={e => setVisibility(e.target.value)}>
+            <option value="">—</option>
+            {Object.values(VisibilityOptions).map(v => (
+              <option key={v} value={v}>{v}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          comment
+          <input value={comment} onChange={e => setComment(e.target.value)} />
+        </div>
+        <button type="submit">add</button>
+      </form>
+
+      <h2>Diary entries</h2>
       <ul>
         {diaries.map(d => (
           <li key={d.id}>
