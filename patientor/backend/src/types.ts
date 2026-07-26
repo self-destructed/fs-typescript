@@ -32,13 +32,13 @@ interface BaseEntry {
   diagnosisCodes?: Array<Diagnosis['code']>;
 }
 
-const HealthCheckRating = {
+export const HealthCheckRating = {
   Healthy: 0,
   LowRisk: 1,
   HighRisk: 2,
   CriticalRisk: 3,
 } as const;
-type HealthCheckRating = typeof HealthCheckRating[keyof typeof HealthCheckRating];
+export type HealthCheckRating = typeof HealthCheckRating[keyof typeof HealthCheckRating];
 
 interface HealthCheckEntry extends BaseEntry {
   type: "HealthCheck";
@@ -70,6 +70,48 @@ export type Entry =
 type UnionOmit<T, K extends string | number | symbol> = T extends unknown ? Omit<T, K> : never;
 
 export type EntryWithoutId = UnionOmit<Entry, 'id'>;
+
+const healthCheckRatingSchema = z.union([
+  z.literal(0),
+  z.literal(1),
+  z.literal(2),
+  z.literal(3),
+]);
+
+const baseEntrySchema = z.object({
+  description: z.string(),
+  date: z.string(),
+  specialist: z.string(),
+  diagnosisCodes: z.array(z.string()).optional(),
+});
+
+const healthCheckEntrySchema = baseEntrySchema.extend({
+  type: z.literal("HealthCheck"),
+  healthCheckRating: healthCheckRatingSchema,
+});
+
+const occupationalHealthcareEntrySchema = baseEntrySchema.extend({
+  type: z.literal("OccupationalHealthcare"),
+  employerName: z.string(),
+  sickLeave: z.object({
+    startDate: z.string(),
+    endDate: z.string(),
+  }).optional(),
+});
+
+const hospitalEntrySchema = baseEntrySchema.extend({
+  type: z.literal("Hospital"),
+  discharge: z.object({
+    date: z.string(),
+    criteria: z.string(),
+  }),
+});
+
+export const newEntrySchema = z.union([
+  healthCheckEntrySchema,
+  occupationalHealthcareEntrySchema,
+  hospitalEntrySchema,
+]);
 
 export interface Patient extends NewPatient {
   id: string;
