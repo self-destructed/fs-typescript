@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Typography, Box } from "@mui/material";
+import { Typography, Box, Button } from "@mui/material";
 import { Male, Female, Transgender } from "@mui/icons-material";
 import axios from "axios";
 
 import patientService from "../../services/patients";
 import EntryDetails from "./EntryDetails";
-import type { Patient, Diagnosis } from "../../types";
+import AddEntryForm from "./AddEntryForm";
+import type { Patient, Diagnosis, EntryWithoutId } from "../../types";
 
 const genderIcon = (gender: string) => {
   switch (gender) {
@@ -25,6 +26,24 @@ const PatientPage = ({ diagnoses }: { diagnoses: Record<string, Diagnosis> }) =>
   const { id } = useParams<{ id: string }>();
   const [patient, setPatient] = useState<Patient | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+
+  const handleAddEntry = async (values: EntryWithoutId) => {
+    try {
+      const newEntry = await patientService.addEntry(id!, values);
+      setPatient(prev => prev && { ...prev, entries: prev.entries.concat(newEntry) });
+      setShowForm(false);
+      setFormError(null);
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e) && e.response?.data && typeof e.response.data === "object" && "error" in e.response.data) {
+        setFormError(JSON.stringify(e.response.data.error));
+      } else {
+        setFormError("Failed to add entry");
+      }
+      throw e;
+    }
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -66,6 +85,12 @@ const PatientPage = ({ diagnoses }: { diagnoses: Record<string, Diagnosis> }) =>
       {patient.entries.map(entry => (
         <EntryDetails key={entry.id} entry={entry} diagnoses={diagnoses} />
       ))}
+      {showForm && <AddEntryForm onSubmit={handleAddEntry} error={formError} />}
+      {!showForm && (
+        <Button variant="contained" sx={{ marginTop: 2 }} onClick={() => setShowForm(true)}>
+          Add entry
+        </Button>
+      )}
     </div>
   );
 };
