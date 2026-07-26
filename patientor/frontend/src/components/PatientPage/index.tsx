@@ -88,7 +88,7 @@ const PatientPage = ({ diagnoses }: { diagnoses: Record<string, Diagnosis> }) =>
       {showForm && <AddEntryForm onSubmit={handleAddEntry} error={formError} diagnoses={diagnoses} />}
       {!showForm && (
         <Button variant="contained" sx={{ marginTop: 2 }} onClick={() => setShowForm(true)}>
-          Add entry
+          Add New Entry
         </Button>
       )}
     </div>
