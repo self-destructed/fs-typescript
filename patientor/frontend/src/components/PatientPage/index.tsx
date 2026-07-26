@@ -5,7 +5,8 @@ import { Male, Female, Transgender } from "@mui/icons-material";
 import axios from "axios";
 
 import patientService from "../../services/patients";
-import type { Patient, Entry, Diagnosis } from "../../types";
+import EntryDetails from "./EntryDetails";
+import type { Patient, Diagnosis } from "../../types";
 
 const genderIcon = (gender: string) => {
   switch (gender) {
@@ -18,16 +19,7 @@ const genderIcon = (gender: string) => {
   }
 };
 
-const EntryDetails = ({ entry, diagnoses }: { entry: Entry; diagnoses: Record<string, Diagnosis> }) => (
-  <Box sx={{ border: 1, borderRadius: 1, padding: 1, marginBottom: 1 }}>
-    <Typography>{entry.date} {entry.description}</Typography>
-    {entry.diagnosisCodes && (
-      <ul>
-        {entry.diagnosisCodes.map(code => <li key={code}>{code} {diagnoses[code]?.name}</li>)}
-      </ul>
-    )}
-  </Box>
-);
+
 
 const PatientPage = ({ diagnoses }: { diagnoses: Record<string, Diagnosis> }) => {
   const { id } = useParams<{ id: string }>();
@@ -70,7 +62,7 @@ const PatientPage = ({ diagnoses }: { diagnoses: Record<string, Diagnosis> }) =>
       <Typography>ssn: {patient.ssn}</Typography>
       <Typography>occupation: {patient.occupation}</Typography>
       {patient.dateOfBirth && <Typography>date of birth: {patient.dateOfBirth}</Typography>}
-      <Typography variant="h5" sx={{ marginTop: 2, marginBottom: 1 }}>entries</Typography>
+      {patient.entries.length > 0 && <Typography variant="h5" sx={{ marginTop: 2, marginBottom: 1 }}>entries</Typography>}
       {patient.entries.map(entry => (
         <EntryDetails key={entry.id} entry={entry} diagnoses={diagnoses} />
       ))}
