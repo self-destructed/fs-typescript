@@ -85,7 +85,7 @@ const PatientPage = ({ diagnoses }: { diagnoses: Record<string, Diagnosis> }) =>
       {patient.entries.map(entry => (
         <EntryDetails key={entry.id} entry={entry} diagnoses={diagnoses} />
       ))}
-      {showForm && <AddEntryForm onSubmit={handleAddEntry} error={formError} />}
+      {showForm && <AddEntryForm onSubmit={handleAddEntry} error={formError} diagnoses={diagnoses} />}
       {!showForm && (
         <Button variant="contained" sx={{ marginTop: 2 }} onClick={() => setShowForm(true)}>
           Add entry

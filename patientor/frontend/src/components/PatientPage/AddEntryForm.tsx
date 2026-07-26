@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Box, Button, TextField, Typography, Select, MenuItem, InputLabel, FormControl } from "@mui/material";
-import { HealthCheckRating, type EntryWithoutId, type HealthCheckRating as HealthCheckRatingType } from "../../types";
+import { Box, Button, TextField, Typography, Select, MenuItem, InputLabel, FormControl, Checkbox, ListItemText, OutlinedInput } from "@mui/material";
+import { HealthCheckRating, type EntryWithoutId, type HealthCheckRating as HealthCheckRatingType, type Diagnosis } from "../../types";
 
 interface Props {
   onSubmit: (values: EntryWithoutId) => Promise<void>;
   error: string | null;
+  diagnoses: Record<string, Diagnosis>;
 }
 
 const ratingLabels: Record<number, string> = {
@@ -14,12 +15,13 @@ const ratingLabels: Record<number, string> = {
   [HealthCheckRating.CriticalRisk]: "Critical risk",
 };
 
-const AddEntryForm = ({ onSubmit, error }: Props) => {
+const AddEntryForm = ({ onSubmit, error, diagnoses }: Props) => {
+  const diagnosisCodesOptions = Object.values(diagnoses).map(d => d.code);
   const [entryType, setEntryType] = useState<"HealthCheck" | "OccupationalHealthcare" | "Hospital">("HealthCheck");
   const [date, setDate] = useState("");
   const [description, setDescription] = useState("");
   const [specialist, setSpecialist] = useState("");
-  const [diagnosisCodes, setDiagnosisCodes] = useState("");
+  const [diagnosisCodes, setDiagnosisCodes] = useState<string[]>([]);
   const [healthCheckRating, setHealthCheckRating] = useState<number>(HealthCheckRating.Healthy);
   const [employerName, setEmployerName] = useState("");
   const [sickLeaveStart, setSickLeaveStart] = useState("");
@@ -31,7 +33,7 @@ const AddEntryForm = ({ onSubmit, error }: Props) => {
     setDate("");
     setDescription("");
     setSpecialist("");
-    setDiagnosisCodes("");
+    setDiagnosisCodes([]);
     setHealthCheckRating(HealthCheckRating.Healthy);
     setEmployerName("");
     setSickLeaveStart("");
@@ -47,9 +49,7 @@ const AddEntryForm = ({ onSubmit, error }: Props) => {
       date,
       description,
       specialist,
-      diagnosisCodes: diagnosisCodes
-        ? diagnosisCodes.split(",").map(c => c.trim())
-        : undefined,
+      diagnosisCodes: diagnosisCodes.length > 0 ? diagnosisCodes : undefined,
     };
 
     let entry: EntryWithoutId;
@@ -117,13 +117,23 @@ const AddEntryForm = ({ onSubmit, error }: Props) => {
           onChange={({ target }) => setSpecialist(target.value)}
           fullWidth
         />
-        <TextField
-          label="Diagnosis codes"
-          value={diagnosisCodes}
-          onChange={({ target }) => setDiagnosisCodes(target.value)}
-          placeholder="e.g. S62.5, Z57.1"
-          fullWidth
-        />
+        <FormControl fullWidth>
+          <InputLabel>Diagnosis codes</InputLabel>
+          <Select
+            multiple
+            value={diagnosisCodes}
+            onChange={({ target }) => setDiagnosisCodes(target.value as string[])}
+            input={<OutlinedInput label="Diagnosis codes" />}
+            renderValue={(selected) => selected.join(", ")}
+          >
+            {diagnosisCodesOptions.map(code => (
+              <MenuItem key={code} value={code}>
+                <Checkbox checked={diagnosisCodes.includes(code)} />
+                <ListItemText primary={code} secondary={diagnoses[code]?.name} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
         {entryType === "HealthCheck" && (
           <FormControl fullWidth>
